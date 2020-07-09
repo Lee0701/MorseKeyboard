@@ -7,12 +7,12 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.View
-import android.widget.Toast
 import androidx.preference.PreferenceManager
 import io.github.lee0701.morsekeyboard.decoder.MorseDecoder
 import io.github.lee0701.morsekeyboard.decoder.TableMorseDecoder
 import io.github.lee0701.morsekeyboard.decoder.table.MorseTable
 import kotlinx.android.synthetic.main.morse_keyboard_view.view.*
+import kotlin.math.max
 
 class MorseKeyboardService: InputMethodService() {
 
@@ -38,6 +38,8 @@ class MorseKeyboardService: InputMethodService() {
 
         val view = View.inflate(this, R.layout.morse_keyboard_view, null)
 
+        var errored = false
+
         val listener = object: MorseDecoder.Listener {
             override fun onLabel(label: String) {
                 view.key.text = label
@@ -45,15 +47,27 @@ class MorseKeyboardService: InputMethodService() {
 
             override fun onText(text: String) {
                 val inputConnection = currentInputConnection ?: return
-                if(text == "\b") {
-                    if(inputConnection.getTextBeforeCursor(1, 0) == " ") inputConnection.deleteSurroundingText(1, 0)
-                    val text = inputConnection.getTextBeforeCursor(30, 0)
-                    val length = text.length - text.lastIndexOf(' ')
+                if(text == "\u0000") {
+                    if(errored) {
+                        if(listOf(" ", "\n").contains(inputConnection.getTextBeforeCursor(1, 0)))
+                            inputConnection.deleteSurroundingText(1, 0)
+                        val textBeforeCursor = inputConnection.getTextBeforeCursor(1024, 0)
+                        val length = textBeforeCursor.length - textBeforeCursor.lastIndexOf('\n')
+                        inputConnection.deleteSurroundingText(length, 0)
+                        errored = false
+                    }
+                } else if(text == "\b") {
+                    if(listOf(" ", "\n").contains(inputConnection.getTextBeforeCursor(1, 0)))
+                        inputConnection.deleteSurroundingText(1, 0)
+                    val textBeforeCursor = inputConnection.getTextBeforeCursor(32, 0)
+                    val length = textBeforeCursor.length - max(textBeforeCursor.lastIndexOf(' '), textBeforeCursor.lastIndexOf('\n'))
                     inputConnection.deleteSurroundingText(length, 0)
+                    errored = true
                 } else if(text == " ") {
                     if(inputConnection.getTextBeforeCursor(1, 0) != "") inputConnection.commitText(text, 1)
                 } else {
                     inputConnection.commitText(text, 1)
+                    errored = false
                 }
             }
 
@@ -61,7 +75,7 @@ class MorseKeyboardService: InputMethodService() {
                 if(vibrateOnMiss) vibrate(200)
             }
         }
-        val table = MorseTable.ERROR + MorseTable.ALPHABET + MorseTable.NUMBER
+        val table = MorseTable.PROSIGN + MorseTable.ALPHABET + MorseTable.NUMBER
         val decoder = TableMorseDecoder(listener, table)
 
         view.key.setOnTouchListener(KeyTouchListener(config, decoder))

@@ -44,8 +44,10 @@ object MorseTable {
         makeCode("-----") to "0"
     )
 
-    val ERROR = mapOf<List<Boolean>, String>(
-        makeCode("........") to "\b"
+    val PROSIGN = mapOf<List<Boolean>, String>(
+        makeCode("..-..-") to "\n",
+        makeCode("........") to "\b",
+        makeCode("..-..-.") to "\u0000"
     )
 
     fun makeCode(code: String): List<Boolean> {
