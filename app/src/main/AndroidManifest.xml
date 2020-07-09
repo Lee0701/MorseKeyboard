@@ -11,25 +11,29 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <service
-            android:name="MorseKeyboardService"
-            android:label="@string/service_name"
-            android:permission="android.permission.BIND_INPUT_METHOD"
-            android:id="@+id/lboard">
-
-            <intent-filter>
-                <action android:name="android.view.InputMethod" />
-            </intent-filter>
-            <meta-data android:name="android.view.im" android:resource="@xml/method" />
-        </service>
-
-        <activity android:name=".SettingsActivity">
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:id="@+id/lboard"
+            android:name=".MorseKeyboardService"
+            android:label="@string/service_name"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/method" />
+        </service>
     </application>
 
 </manifest>

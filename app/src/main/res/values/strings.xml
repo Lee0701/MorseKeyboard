@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">Morse Keyboard</string>
     <string name="service_name">Morse Keyboard</string>
+    <string name="title_activity_settings">Morse Keyboard Settings</string>
+
+    <string name="input_header">Input</string>
+    <string name="dash_length">Dash Length</string>
+    <string name="short_break_length">Short Break Length</string>
+    <string name="long_break_length">Long Break Length</string>
+
+    <string name="feedback_header">Feedback</string>
+    <string name="vibrate_on_miss">Vibrate on Miss</string>
+
 </resources>

@@ -1,8 +1,14 @@
 package io.github.lee0701.morsekeyboard
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.inputmethodservice.InputMethodService
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.View
 import android.widget.Toast
+import androidx.preference.PreferenceManager
 import io.github.lee0701.morsekeyboard.decoder.MorseDecoder
 import io.github.lee0701.morsekeyboard.decoder.TableMorseDecoder
 import io.github.lee0701.morsekeyboard.decoder.table.MorseTable
@@ -10,9 +16,26 @@ import kotlinx.android.synthetic.main.morse_keyboard_view.view.*
 
 class MorseKeyboardService: InputMethodService() {
 
-    val config = KeyTouchListener.Config(250L, 500L, 1000L)
+    lateinit var preference: SharedPreferences
+    lateinit var config: KeyTouchListener.Config
+
+    lateinit var vibrator: Vibrator
+
+    override fun onCreate() {
+        super.onCreate()
+        PreferenceManager.setDefaultValues(this, R.xml.root_preferences, true)
+        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
 
     override fun onCreateInputView(): View {
+        preference = PreferenceManager.getDefaultSharedPreferences(this)
+        config = KeyTouchListener.Config(
+            preference.getInt("dash_length", 200).toLong(),
+            preference.getInt("short_break_length", 500).toLong(),
+            preference.getInt("long_break_length", 2000).toLong()
+        )
+        val vibrateOnMiss = preference.getBoolean("vibrate_on_miss", true)
+
         val view = View.inflate(this, R.layout.morse_keyboard_view, null)
 
         val listener = object: MorseDecoder.Listener {
@@ -35,7 +58,7 @@ class MorseKeyboardService: InputMethodService() {
             }
 
             override fun onMiss() {
-                Toast.makeText(this@MorseKeyboardService, "Miss", Toast.LENGTH_SHORT).show()
+                if(vibrateOnMiss) vibrate(200)
             }
         }
         val table = MorseTable.ERROR + MorseTable.ALPHABET + MorseTable.NUMBER
@@ -48,4 +71,10 @@ class MorseKeyboardService: InputMethodService() {
     override fun onEvaluateFullscreenMode(): Boolean {
         return false
     }
+
+    private fun vibrate(length: Long) {
+        if(Build.VERSION.SDK_INT >= 26) vibrator.vibrate(VibrationEffect.createOneShot(length, VibrationEffect.DEFAULT_AMPLITUDE))
+        else vibrator.vibrate(length)
+    }
+
 }
