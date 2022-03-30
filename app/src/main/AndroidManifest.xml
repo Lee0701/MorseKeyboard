@@ -13,7 +13,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings">
+            android:label="@string/title_activity_settings"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,9 +23,10 @@
         </activity>
 
         <service
-            android:id="@+id/lboard"
+            android:id="@+id/morse_keyboard"
             android:name=".MorseKeyboardService"
             android:label="@string/service_name"
+            android:exported="true"
             android:permission="android.permission.BIND_INPUT_METHOD">
             <intent-filter>
                 <action android:name="android.view.InputMethod" />

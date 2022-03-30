@@ -51,7 +51,7 @@ class MorseKeyboardService: InputMethodService() {
                     if(errored) {
                         if(listOf(" ", "\n").contains(inputConnection.getTextBeforeCursor(1, 0)))
                             inputConnection.deleteSurroundingText(1, 0)
-                        val textBeforeCursor = inputConnection.getTextBeforeCursor(1024, 0)
+                        val textBeforeCursor = inputConnection.getTextBeforeCursor(1024, 0) ?: ""
                         val length = textBeforeCursor.length - textBeforeCursor.lastIndexOf('\n')
                         inputConnection.deleteSurroundingText(length, 0)
                         errored = false
@@ -59,7 +59,7 @@ class MorseKeyboardService: InputMethodService() {
                 } else if(text == "\b") {
                     if(listOf(" ", "\n").contains(inputConnection.getTextBeforeCursor(1, 0)))
                         inputConnection.deleteSurroundingText(1, 0)
-                    val textBeforeCursor = inputConnection.getTextBeforeCursor(32, 0)
+                    val textBeforeCursor = inputConnection.getTextBeforeCursor(32, 0) ?: ""
                     val length = textBeforeCursor.length - max(textBeforeCursor.lastIndexOf(' '), textBeforeCursor.lastIndexOf('\n'))
                     inputConnection.deleteSurroundingText(length, 0)
                     errored = true

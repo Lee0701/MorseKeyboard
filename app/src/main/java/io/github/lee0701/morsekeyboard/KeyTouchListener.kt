@@ -27,6 +27,7 @@ class KeyTouchListener(val config: KeyTouchListener.Config, val listener: Listen
                 when(state) {
                     State.DOT -> listener.onDot()
                     State.DASH -> listener.onDash()
+                    else -> {}
                 }
                 v.performClick()
 
